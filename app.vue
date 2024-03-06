@@ -1,14 +1,13 @@
 <template>
-  <!-- <div>
-    <NuxtWelcome />
-    <div class="btn text-xl text-green-200">34</div>
-  </div> -->
+
   <Index></Index>
 
 </template>
 
 <script setup>
-import Index from "./pages/index";
+// import Index from "./pages/index";
+import Index from './pages/index.vue'
+
 </script>
 
 <style>
