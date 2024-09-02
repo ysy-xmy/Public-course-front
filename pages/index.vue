@@ -1,6 +1,66 @@
 <template>
+    <div class="top flex w-full justify-center item content-center pt-3">
+        <div class="select-box w-full grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-2 px-4">
+
+            <select v-model="selectedCampus" @change="changeinput" class="select select-bordered">
+                <option value="" selected>校区：全部</option>
+                <option value="1">松山湖</option>
+                <option value="2">莞城</option>
+
+            </select>
+            <select v-model="selecttype" @change="changeinput" class="select select-bordered">
+                <option value="" selected>类别：全部</option>
+                <option value="沟通">沟通</option>
+                <option value="高阶">高阶</option>
+                <option value="认知">认知</option>
+                <option value="应用">应用</option>
+
+                <option value="道德">道德</option>
+
+                <option value="审美">审美</option>
+
+                <option value="协作">协作</option>
+            </select>
+            <select v-model="selecttime" @change="changeinput" class="select select-bordered">
+                <option value="" selected>时间：全部</option>
+                <option value="周 一">周一</option>
+                <option value="周 二">周二</option>
+                <option value="周 三">周三</option>
+                <option value="周 四">周四</option>
+                <option value="周 五">周五</option>
+                <option value="周 六">周六</option>
+                <option value="周 日">周日</option>
+
+            </select>
+            <select v-model="selectMode" @change="changeinput" class="select select-bordered">
+                <option value="" selected>类型：全部</option>
+                <option value="混合公选">混合公选</option>
+                <option value="面授公选">面授公选</option>
+            </select>
+
+            <div class="search md:w-auto w-full ">
+                <div class="group md:w-auto w-full">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" class="icon">
+                        <g>
+                            <path
+                                d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z">
+                            </path>
+                        </g>
+                    </svg>
+                    <input @keyup="changeinput" class="input" v-model="coursename" type="search" placeholder="Search" />
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="w-full flex justify-center">
+        <div class="divider h-1 w-11/12 divider-end text-[#abacac]">共找到{{ showdata.length }}个课程</div>
+    </div>
+
     <div class="w-screen flex px-6 justify-center content-start items-start flex-wrap">
-        <div class="course-box m-4   w-96 " v-for="(item, index) in courselist">
+
+        <div class="course-box m-4   w-96 " v-for="(item, index) in showdata">
             <div class="course-card  card w-96 bg-base-100 shadow-xl">
                 <!-- <figure><img src="https://daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg" alt="Shoes" />
             </figure> -->
@@ -8,16 +68,20 @@
                     <h2 class="card-title">
                         {{ item.kc }}
                         <div class="badge badge-secondary  w-16 whitespace-nowrap">{{ item.kcsx }}</div>
-                        <div class="badge  badge-accent w-20 whitespace-nowrap">莞城</div>
+                        <div class="badge  badge-accent w-20 whitespace-nowrap">{{ item.xqdm == '1' ? '松山湖' : '莞城' }}
+                        </div>
 
                     </h2>
+                    <div class="w-full px-2">
 
-                    <p>If a dog chews shoes whose shoes does he choose?</p>
+                        <p>时间：<span class="font-bold underline">{{ item.sksj }}</span> </p>
+                        <p>教室：{{ item.skdd }} </p>
+                    </div>
+
                     <div class="card-actions justify-between">
                         <div class="flex flex-nowrap">
 
-                            <div class=" badge-outline">黄为</div>
-
+                            <div class=" badge-outline">[{{ item.kcdm }}] {{ item.rkjs }}</div>
                         </div>
                         <div class="flex flex-wrap justify-end ">
                             <div class=" badge-outline ">学分：{{ item.xf }} &nbsp;</div>
@@ -28,8 +92,8 @@
 
                     </div>
                     <div class="progress-box flex flex-nowrap items-center content-center">
-                        <progress class="progress progress-accent w-11/12" value="70" max="100"></progress>
-                        <span class="ml-2 text-sm">1/100</span>
+                        <progress class="progress progress-accent w-11/12" :value=item.yxrs :max=item.xkrssx></progress>
+                        <span class="ml-2 text-sm">{{ item.yxrs }}/{{ item.xkrssx }}</span>
                     </div>
 
 
@@ -44,31 +108,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-
-// const course = ref({
-//     "kc": "[1310602](面授公选)合唱",
-//     "xf": "2.0",
-//     "zxs": "32",
-//     "lb": "公共课/任选课",
-//     "kcsx": "通识(审美)/理论课",
-//     "skbjdm": "",
-//     "xkfs": "",
-//     "rkjs": "",
-//     "xk_points": "",
-//     "is_buy_book": "",
-//     "is_cx": "",
-//     "xk_status": "",
-//     "operation": "选择",
-//     "kcdm": "1310602",
-//     "kclb1": "03",
-//     "kclb2": "01",
-//     "khfs": "02",
-//     "kclb3": "20",
-//     "is_yxtj": "",
-//     "skbzdm": ""
-// });
-// teacher, 校区，已选人数，可选人数，上课时间，上课地点
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 
 interface Course {
     kc: string;
@@ -91,595 +132,125 @@ interface Course {
     kclb3: string;
     is_yxtj: string;
     skbzdm: string;
+    skbjmc: string;
+    skbzmc: string;
+    xqmc: string;
+    skfs_mc: string;
+    xkrssx: string;
+    xkrs: string;
+    kxrs: string;
+    sksj: string;
+    skdd: string;
+    ischk: string;
+    xqdm: string;
+    skfs_m: string;
+    outnumber: string;
+    yxrs: string;
+    yxsyxkb: string;
+
+
 }
 
-// 确保course的类型与Course接口匹配
-const course = ref<Course>({
-    // ... (同样的对象)
+
+
+
+const courselist = ref<Course[]>([]);
+const selectedCampus: string = ref('')
+const showdata: Array = ref([])
+const selecttype: string = ref('')
+const selectMode: string = ref('')
+const coursename: string = ref('')
+
+
+const changeinput = () => {
+    let temp = courselist.value.filter((item) => {
+        return item.kc.includes(coursename.value)
+    }).filter((item) => {
+        return item.kc.includes(selectMode.value)
+    }).filter((item) => {
+        return item.xqdm.includes(selectedCampus.value)
+    }).filter((item) => {
+        return item.kcsx.includes(selecttype.value)
+    }).filter((item) => {
+        return item.sksj.includes(selecttime.value)
+    })
+    showdata.value = temp
+}
+const selecttime: string = ref('')
+
+onMounted(() => {
+
+
+
+    axios.get('http://8.219.8.132:1623/api/courselist').then((res) => {
+        console.log(res.data.data);
+        courselist.value = res.data.data;
+        for (let i = 0; i < courselist.value.length; i++) {
+            courselist.value[i].kcsx = courselist.value[i].kcsx.replaceAll('通识', '').replaceAll('/理论课', '').replaceAll('(', "").replaceAll(')', '')
+            courselist.value[i].yxrs = parseInt(courselist.value[i].xkrssx) - parseInt(courselist.value[i].kxrs);
+            courselist.value[i].kc = courselist.value[i].kc.split(']')[1]
+            courselist.value[i].rkjs = courselist.value[i].rkjs.split(']')[1]
+
+        }
+        showdata.value = courselist.value
+    });
 });
 
-const courselist = [
-    {
-        "kc": "[0310468](混合公选)意大利文化",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(沟通)/理论课",
-        "skbjdm": "0310468-002",
-        "xkfs": "学生网上选",
-        "rkjs": "[2021011]陈晓涌",
-        "xk_points": "0",
-        "is_buy_book": "0",
-        "is_cx": "0",
-        "xk_status": "选中",
-        "operation": "查看 | 退选",
-        "kcdm": "0310468",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "25",
-        "is_yxtj": "1",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0811023](混合公选)解读中国经济发展的密码",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(协作)/理论课",
-        "skbjdm": "0811023-001",
-        "xkfs": "学生网上选",
-        "rkjs": "[1997003]黄琼",
-        "xk_points": "0",
-        "is_buy_book": "0",
-        "is_cx": "0",
-        "xk_status": "选中",
-        "operation": "查看 | 退选",
-        "kcdm": "0811023",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "21",
-        "is_yxtj": "1",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0210457](面授公选)发光与显示",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(认知)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "20202364",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "22",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0210768](混合公选)数学的思维方式与创新",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(认知)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "0210768",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "22",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0210793](混合公选)精读《未来简史》",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(高阶)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "0210793",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "24",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0310465](混合公选)科幻中的物理学",
-        "xf": "1.5",
-        "zxs": "24",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(高阶)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "0310465",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "24",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0310467](混合公选)拉美文化",
-        "xf": "1.5",
-        "zxs": "24",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(沟通)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "0310467",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "25",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0410258](面授公选)数学建模",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(应用)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "382205",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "23",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0410495](面授公选)功夫与防身技术",
-        "xf": "2.0",
-        "zxs": "33",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(应用)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "0410495",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "23",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0710042](混合公选)法律与社会",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(道德)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "0710042",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "19",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0710043](混合公选)大学生恋爱与性健康",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(道德)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "0710043",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "19",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0810958](混合公选)外经贸英语函电",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(沟通)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "0810958",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "25",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0811022](混合公选)推开经济学之门",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(协作)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "0811022",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "21",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0811024](混合公选)经济学原理（上）：中国故事",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(协作)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "0811024",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "21",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0811030](混合公选)经济基础与应用",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(应用)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "0811030",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "23",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0811032](混合公选)有效沟通技巧",
-        "xf": "1.0",
-        "zxs": "16",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(沟通)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "0811032",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "25",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0811034](混合公选)电影与幸福感",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(认知)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "0811034",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "22",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[0811035](混合公选)东方电影",
-        "xf": "1.0",
-        "zxs": "16",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(认知)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "0811035",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "22",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[1010871](混合公选)情绪管理",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(沟通)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "1010871",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "25",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[1010872](混合公选)欧洲文明概论",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(沟通)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "1010872",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "25",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[1010873](混合公选)东南亚文化",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(沟通)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "1010873",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "25",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[1010878](面授公选)摄影",
-        "xf": "1.5",
-        "zxs": "24",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(审美)",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "203000614",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "20",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[1110529](面授公选)公共管理",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(认知)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "1110529",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "22",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[1110530](面授公选)公益慈善",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(道德)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "1110530",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "19",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[1110531](面授公选)社会保障学",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(应用)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "1110531",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "23",
-        "is_yxtj": "",
-        "skbzdm": ""
-    },
-    {
-        "kc": "[1310602](面授公选)合唱",
-        "xf": "2.0",
-        "zxs": "32",
-        "lb": "公共课/任选课",
-        "kcsx": "通识(审美)/理论课",
-        "skbjdm": "",
-        "xkfs": "",
-        "rkjs": "",
-        "xk_points": "",
-        "is_buy_book": "",
-        "is_cx": "",
-        "xk_status": "",
-        "operation": "选择",
-        "kcdm": "1310602",
-        "kclb1": "03",
-        "kclb2": "01",
-        "khfs": "02",
-        "kclb3": "20",
-        "is_yxtj": "",
-        "skbzdm": ""
-    }
-]
-
-for (let i = 0; i < courselist.length; i++) {
-    courselist[i].kcsx = courselist[i].kcsx.replaceAll('通识', '').replaceAll('/理论课', '').replaceAll('(', "").replaceAll(')', '')
-}
 
 
 
 </script>
 
 
-<style></style>
+<style scoped>
+.search {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+    position: relative;
+
+}
+
+.group {
+    display: flex;
+    line-height: 28px;
+    align-items: center;
+    position: relative;
+    width: 100%;
+}
+
+.input {
+    width: 100%;
+    height: 40px;
+    line-height: 28px;
+    padding: 0 1rem;
+    padding-left: 2.5rem;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    outline: none;
+    background-color: #f3f3f4;
+    color: #0d0c22;
+    transition: 0.3s ease;
+}
+
+.input::placeholder {
+    color: #9e9ea7;
+}
+
+.input:focus,
+input:hover {
+    outline: none;
+    border-color: rgba(0, 48, 73, 0.4);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgb(0 48 73 / 10%);
+}
+
+.icon {
+    position: absolute;
+    left: 1rem;
+    fill: #9e9ea7;
+    width: 1rem;
+    height: 1rem;
+}
+</style>
