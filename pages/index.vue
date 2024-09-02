@@ -181,8 +181,7 @@ const selecttime: string = ref('')
 onMounted(() => {
 
 
-
-    axios.get('http://8.219.8.132:1623/api/courselist').then((res) => {
+    axios.get('https://meet.ysyxmy.top:1814/api/courselist').then((res) => {
         console.log(res.data.data);
         courselist.value = res.data.data;
         for (let i = 0; i < courselist.value.length; i++) {
